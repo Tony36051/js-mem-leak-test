@@ -1,0 +1,44 @@
+*** Settings ***
+Library           String
+Library           Collections
+Library           Selenium2Library
+Library           RequestsLibrary
+Library           OperatingSystem
+Resource          Timing.txt
+
+*** Keywords ***
+打开Chrome
+    [Arguments]    ${url}
+    Comment    ${options}    Evaluate    sys.modules['selenium.webdriver'].ChromeOptions()    sys,selenium.webdriver
+    Comment    Call Method    ${options}    add_argument    C:\Users\Administrator\AppData\Local\Google\Chrome\User Data\Default
+    Comment    Call Method    ${options}    add_extension    ${CURDIR}\\httpwatch.crx
+    Comment    Create Webdriver    Chrome    chrome_options=${options}
+    Comment    Go To    ${url}
+    ${args_list}    Create List    user-data-dir=${OUTPUT DIR}${/}chrome_data    enable-precise-memory-info
+    ${chromeOptions}    Create Dictionary    args    ${args_list}
+    ${cap_dict}    Create Dictionary    chromeOptions    ${chromeOptions}
+    ${instance}    Open Browser    ${url}    chrome    desired_capabilities=${cap_dict}
+    Maximize Browser Window
+    [Return]    ${instance}
+
+打开远程浏览器
+    [Arguments]    ${url}=None    ${browser}=chrome    ${alias}=
+    Open Browser    ${url}    ${browser}    ${alias}    ${HUB}
+
+清理谷歌浏览器进程
+    [Documentation]    描述：清除浏览器进程
+    Log    ****清除谷歌浏览器进程开始
+    OperatingSystem.Run    taskkill /f /t /im chromedriver.exe
+    Log    ****清除谷歌浏览器进程结束
+
+切换到新打开的tab
+    ${windowHandlers}=    Get Window Handles
+    ${newWindow}=    Get From List    ${windowHandlers}    1
+    Select Window By Handle    ${newWindow}
+
+按顺序切换新打开的tab
+    [Arguments]    ${count}
+    [Documentation]    此AW用于跳转到新打开的tab页，需传入一个tab页数的参数，1表示新打开1个tab，2表示打开2个，以此类推...
+    ${windowHandlers}=    Get Window Handles
+    ${newWindow}=    Get From List    ${windowHandlers}    ${count}
+    Select Window By Handle    ${newWindow}

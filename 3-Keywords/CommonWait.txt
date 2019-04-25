@@ -1,0 +1,26 @@
+*** Settings ***
+Library           String
+Library           Collections
+Library           Selenium2Library
+Library           RequestsLibrary
+Library           OperatingSystem
+Resource          Timing.txt
+
+*** Keywords ***
+等待加载
+    log    @@@@WaitForLoading开始
+    Wait Until Element Is Not Visible    ${common_configUILoadingCover}    100
+    log    @@@@WaitForLoading结束
+
+等到页面包含元素为止_EK
+    [Arguments]    ${locator}    ${timeout}=100
+    [Documentation]    只有输入${locator}不为None或空时，才执行该操作
+    ${isNotNone}    Is Not None And Not Empty    ${locator}
+    Run Keyword And Return If    ${isNotNone}    Wait Until Page Contains Element    ${locator}    ${timeout}
+
+等到元素可见为止_EK
+    [Arguments]    ${Locator}
+    log    <等到元素可见为止
+    等到页面包含元素为止_EK    ${Locator}
+    Wait Until Element Is Visible    ${Locator}
+    log    <等到元素可见为止>

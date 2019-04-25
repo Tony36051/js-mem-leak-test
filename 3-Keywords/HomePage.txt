@@ -1,0 +1,17 @@
+*** Settings ***
+Resource          Common.txt
+Resource          ../2-DOMElement/commonVariable.txt
+Resource          ../2-DOMElement/HomePage.txt
+
+*** Keywords ***
+登录
+    [Arguments]    ${url}=${Url_A3}    ${userName}=${User_A3}    ${passWord}=${Password_A3}
+    [Documentation]    如果不需要url，则填None
+    Log    《登录
+    Comment    Get Variable Value    ${browser}    chrome
+    Comment    Run Keyword If    '${browser}'=='chrome' or '${browser}'=='Chrome' or '${browser}'=='CHROME'    打开Chrome    ${url}
+    sleep    1
+    输入文本_EK    ${LoginPage_userNameInput}    ${userName}
+    输入密码_EK    ${LoginPage_passwordInput}    ${passWord}
+    点击元素_EK    ${LoginPage_submitBtn}
+    Log    登录》

@@ -1,0 +1,80 @@
+*** Settings ***
+Library           String
+Library           Collections
+Library           Selenium2Library
+Library           RequestsLibrary
+Library           OperatingSystem
+Resource          Timing.txt
+Library           DateTime
+
+*** Keywords ***
+获取元素class属性
+    [Arguments]    ${xpath}    ${state}
+    ${ClassName}=    Execute Javascript    return window.document.evaluate('${xpath}', document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.className
+    ${ret}=    Get Lines Containing String    ${ClassName}    ${state}
+    Should Not Be Empty    ${ret}
+    [Return]    ${ret}
+
+获取页面元素title属性
+    [Arguments]    ${xpath}
+    ${Name}=    Execute Javascript    return window.document.evaluate('${xpath}', document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.getAttribute("title")
+    [Return]    ${Name}
+
+获取页面元素disabled的值
+    [Arguments]    ${xpath}
+    ${True}=    Execute Javascript    return window.document.evaluate('${xpath}', document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.disabled
+    [Return]    ${True}
+
+获取元素文本_EK
+    [Arguments]    ${locator}    ${timeout}=${WAITTIMEOUT}
+    [Documentation]    无论${locator}有没有都会执行
+    等到页面包含元素为止_EK    ${locator}
+    ${text}    Get Text    ${locator}
+    [Return]    ${text}
+
+获取元素属性_EK
+    [Arguments]    ${attribute_locator}
+    [Documentation]    无论${locator}有没有都会执行
+    log    ++++获得属性开始
+    ${attribute}    Get Element Attribute    ${attribute_locator}
+    log    ++++获得属性结束
+    [Return]    ${attribute}
+
+获取URL的查询参数值
+    [Arguments]    ${queryParameterKey}
+    [Documentation]    取URL的query参数的值
+    ${url}    Get Location
+    ${queryParameterValue}    Execute Javascript    var url = "${url}"; var list = url.split("&"); for (var i=0;i<list.length;i++){ \    if (list[i].indexOf("${queryParameterKey}")>-1){ \    \    queryParameterValue = list[i].split("=")[1]; \    } } \ return queryParameterValue;
+    [Return]    ${queryParameterValue}
+
+获取元素值_EK
+    [Arguments]    ${locator}    ${timeout}=${WAITTIMEOUT}
+    [Documentation]    无论${locator}有没有都会执行
+    等到页面包含元素为止_EK    ${locator}
+    ${value}    Get Value    ${locator}
+    [Return]    ${value}
+
+获取开始时间
+    log    《获取开始时间
+    ${start_time}    Get Current Time Millis    #扩展库中的方法
+    comment    ${start_time}    Get Current Date    result_format=epoch    #用这种方法取时间也可以
+    log    《获取开始时间》
+    get current date
+    [Return]    ${start_time}
+
+获取结束时间
+    log    《获取结束时间
+    ${end_time}    Get Current Time Millis
+    log    《获取结束时间》
+    [Return]    ${end_time}
+
+获取持续时间
+    [Arguments]    ${start_time}    ${end_time}
+    log    《获取结束时间
+    ${Estimating}    Evaluate    ${end_time}-${start_time}
+    log    《获取结束时间》
+    [Return]    ${Estimating}
+
+Get Current Time Millis
+    ${ret}=    DateTime.Get Current Date    result_format=Epoch
+    [Return]    ${ret}

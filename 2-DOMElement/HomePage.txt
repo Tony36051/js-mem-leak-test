@@ -1,0 +1,7 @@
+*** Settings ***
+Resource          ../3-Keywords/Common.txt
+
+*** Variables ***
+${LoginPage_userNameInput}    uid
+${LoginPage_passwordInput}    password
+${LoginPage_submitBtn}    //*[@id="page-input-holder"]/form/div/input[2]

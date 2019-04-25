@@ -1,0 +1,34 @@
+*** Settings ***
+Library           String
+Library           Collections
+Library           Selenium2Library
+Library           RequestsLibrary
+Library           OperatingSystem
+Resource          Timing.txt
+Resource          CommonAction.txt
+Resource          CommonResolve.txt
+Resource          CommonWait.txt
+Resource          CommonAssert.txt
+Resource          CommonDriver.txt
+Resource          ../2-DOMElement/commonVariable.txt
+
+*** Keywords ***
+Insert Excel
+    [Arguments]    ${excelFilePath}    ${rowIndex}    ${testScenario}    ${testResult}
+    Open Excel    ${excelFilePath}
+    ${sheetName}=    Get Sheet Names
+    Put String To Cell    ${sheetName[0]}    0    ${rowIndex}    ${testScenario}
+    Put String To Cell    ${sheetName[0]}    1    ${rowIndex}    ${testResult}
+    Save Excel    testExcel.xls
+    Remove File    ${excelFilePath}
+    Copy File    testExcel.xls    ${excelFilePath}
+
+是否包含
+    [Arguments]    ${content}    ${pattern}
+    ${status}    Run Keyword And Return Status    Should Contain    ${content}    ${pattern}
+    [Return]    ${status}
+
+是否含有元素
+    [Arguments]    ${locator}
+    ${status}    Run Keyword And Return Status    Page Should Contain Element    ${locator}    ${locator} not found
+    [Return]    ${status}

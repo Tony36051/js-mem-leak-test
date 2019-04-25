@@ -1,0 +1,9 @@
+*** Settings ***
+Resource          ../3-Keywords/Common.txt
+
+*** Variables ***
+${LoopTimeOut}    30    # 循环等待时间
+${WAITTIMEOUT}    10    # 等待元素出现时间
+${browser}        chrome
+${User_A3}        test1
+${Password_A3}    passwd

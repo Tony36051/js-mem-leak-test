@@ -1,0 +1,32 @@
+*** Settings ***
+Library           String
+Library           Collections
+Library           Selenium2Library
+Library           RequestsLibrary
+Library           OperatingSystem
+Resource          Timing.txt
+
+*** Keywords ***
+文本域应该包含_EK
+    [Arguments]    ${locator}    ${text}    ${timeout}=${WAITTIMEOUT}
+    [Documentation]    无论${locator}有没有都会执行
+    等到页面包含元素为止_EK    ${locator}
+    Textfield Should Contain    ${locator}    ${text}
+
+元素应该可见_EK
+    [Arguments]    ${locator}    ${timeout}=${WAITTIMEOUT}
+    [Documentation]    无论${locator}有没有都会执行
+    等到页面包含元素为止_EK    ${locator}
+    Element Should Be Visible    ${locator}
+
+元素应该包含_EK
+    [Arguments]    ${locator}    ${text}    ${timeout}=${WAITTIMEOUT}
+    [Documentation]    无论${locator}有没有都会执行
+    等到页面包含元素为止_EK    ${locator}
+    Element Should Contain    ${locator}    ${text}
+
+元素不应该包含_EK
+    [Arguments]    ${locator}    ${text}    ${timeout}=${WAITTIMEOUT}
+    [Documentation]    无论${locator}有没有都会执行
+    等到页面包含元素为止_EK    ${locator}
+    Element Should Not Contain    ${locator}    ${text}

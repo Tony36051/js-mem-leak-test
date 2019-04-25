@@ -1,0 +1,13 @@
+*** Settings ***
+Resource          Common.txt
+
+*** Keywords ***
+获取当前时间
+    ${ret}=    Execute Javascript    var date=new Date(); return date.getMilliseconds()+date.getSeconds()*1000+date.getMinutes()*60000+date.getHours()*3600000
+    [Return]    ${ret}
+
+获取当前时间JS
+    log    《获取开始时间
+    ${currentTime}    Execute Javascript    var date=new Date();var current_time= date.getTime()/1000;return current_time;
+    log    《获取开始时间》
+    [Return]    ${currentTime}

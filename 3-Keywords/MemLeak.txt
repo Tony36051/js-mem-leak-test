@@ -1,0 +1,29 @@
+*** Settings ***
+Library           String
+Library           Collections
+Library           Selenium2Library
+Library           ../5-Extendlibrary/MemoryLeak/MemUsageExcel.py
+
+*** Keywords ***
+获取Chrome浏览器驱动pid
+    [Arguments]    ${instance_id}
+    ${se}    Get Library Instance    Selenium2Library
+    ${driver}    Set Variable    ${se.driver}
+    ${pid}    Set Variable    ${driver.service.process.pid}
+    [Return]    ${pid}
+
+统计js内存
+    Sleep    2
+    ${mem_dict}    Execute Javascript    return window.performance.memory
+    ${used}    Evaluate    int(${mem_dict['usedJSHeapSize']}) / 1024 / 1024
+    ${total}    Evaluate    int(${mem_dict['totalJSHeapSize']}) / 1024 / 1024
+    [Return]    ${used}    ${total}
+
+开始记录
+    [Arguments]    ${driver}
+    ${chrome_driver_pid}    获取Chrome浏览器驱动pid    ${driver}
+    MemUsageExcel.Record Column Title    ${chrome_driver_pid}
+
+记录当前内存使用情况
+    ${used}    ${total}    统计js内存
+    MemUsageExcel.Record Memory Info    ${used}    ${total}

@@ -1,0 +1,135 @@
+*** Settings ***
+Library           String
+Library           Collections
+Library           Selenium2Library
+Library           RequestsLibrary
+Library           OperatingSystem
+Resource          Timing.txt
+
+*** Keywords ***
+点击元素_EK
+    [Arguments]    ${locator}    ${timeout}=${WAITTIMEOUT}
+    [Documentation]    只有输入${locator}不为None或空时，才执行该操作
+    log    <点击元素${locator}
+    ${isNotNone}    Is Not None And Not Empty    ${locator}
+    Run Keyword If    ${isNotNone}    等到页面包含元素为止_EK    ${locator}    ${timeout}
+    Run Keyword If    ${isNotNone}    Wait Until Keyword Succeeds    ${timeout}    1    Click Element    ${locator}
+    log    <点击元素${locator}>
+
+点击元素_通过定位和文本_EK
+    [Arguments]    ${locator}    ${Text}    ${timeout}=${WAITTIMEOUT}
+    [Documentation]    只有输入${locator}不为None或空时，才执行该操作
+    ${isNotNone}    Is Not None And Not Empty    ${locator}
+    Run Keyword If    ${isNotNone}    等到页面包含元素为止_EK    ${locator}
+    Run Keyword If    ${isNotNone}    Wait Until Keyword Succeeds    ${timeout}    1    Click Element By Locator And Text    ${locator}
+    ...    ${Text}
+
+双击元素_EK
+    [Arguments]    ${locator}    ${timeout}=${WAITTIMEOUT}
+    [Documentation]    只有输入${locator}不为None或空时，才执行该操作
+    ${isNotNone}    Is Not None And Not Empty    ${locator}
+    Run Keyword If    ${isNotNone}    等到页面包含元素为止_EK    ${locator}    ${timeout}
+    Run Keyword If    ${isNotNone}    Wait Until Keyword Succeeds    ${timeout}    1    Double Click Element    ${locator}
+
+点击右键_EK
+    [Arguments]    ${locator}    ${timeout}=${WAITTIMEOUT}
+    [Documentation]    只有输入${locator}不为None或空时，才执行该操作
+    ${isNotNone}    Is Not None And Not Empty    ${locator}
+    Run Keyword If    ${isNotNone}    等到页面包含元素为止_EK    ${locator}    ${timeout}
+    Run Keyword If    ${isNotNone}    Wait Until Keyword Succeeds    ${timeout}    1    Open Context Menu    ${locator}
+
+拖动元素_指定偏移量_EK
+    [Arguments]    ${source}    ${xoffset}    ${yoffset}    ${timeout}=${WAITTIMEOUT}
+    等到页面包含元素为止_EK    ${source}
+    Wait Until Keyword Succeeds    ${timeout}    1    Drag And Drop By Offset    ${source}    ${xoffset}    ${yoffset}
+
+拖动元素_EK
+    [Arguments]    ${source}    ${target}    ${timeout}=${WAITTIMEOUT}
+    等到页面包含元素为止_EK    ${source}
+    等到页面包含元素为止_EK    ${target}
+    Wait Until Keyword Succeeds    ${timeout}    1    Drag And Drop    ${source}    ${target}
+
+鼠标移到元素上_EK
+    [Arguments]    ${locator}    ${timeout}=${WAITTIMEOUT}
+    [Documentation]    只有输入${locator}不为None或空时，才执行该操作
+    ${isNotNone}    Is Not None And Not Empty    ${locator}
+    Run Keyword If    ${isNotNone}    Wait Until Element Is Visible    ${locator}
+    Run Keyword If    ${isNotNone}    Mouse Over    ${locator}
+
+滚动到目标元素可见（先点击某处）
+    [Arguments]    ${element}    ${targetElement}
+    点击元素_EK    ${element}
+    : FOR    ${i}    IN RANGE    10000
+    \    按下键盘_EK    ${element}    \\25
+    \    ${isVisible}    Is Element Visible    ${targetElement}
+    \    Exit For Loop If    ${isVisible}
+
+从下拉列表选择
+    [Arguments]    ${dropdown_locator}    ${list_locator}    ${value}
+    log    <从下拉列表选择
+    点击元素_EK    ${dropdown_locator}
+    Sleep    1
+    等到页面包含元素为止_EK    ${list_locator}
+    点击元素_通过定位和文本_EK    ${list_locator}    ${value}
+    log    <从下拉列表选择
+
+从一级下拉列表选择值
+    [Arguments]    ${dropDownLocator}=None    ${list1Locator}=None    ${list1Value}=None
+    [Documentation]    被selectFromListByValue调用
+    点击元素_EK    ${dropDownLocator}
+    点击元素_通过定位和文本_EK    ${list1Locator}    ${list1Value}
+
+从下拉列表选择值_General
+    [Arguments]    ${dropdownLocator}=None    ${list1Locator}=None    ${list1ItemLocator}=None    ${list1Value}=None    ${list2Locator}=None    ${list2Value}=None
+    [Documentation]    list1为一级菜单，list2为2级菜单，如果没有2级菜单，则点击一级菜单，有二级菜单，则点击二级菜单
+    Log    ****selectFromListByValue开始
+    ${isNotEqual}    Is Not None And Not Empty    ${dropdownLocator}
+    Run Keyword If    ${isNotEqual}    从一级下拉列表选择值    ${dropdownLocator}    ${list1Locator}    ${list1Value}
+    ${isNotEqual}    Is Not None And Not Empty    ${list2Locator}
+    Run Keyword If    ${isNotEqual}    从二级下拉列表选择值    ${dropdownLocator}    ${list1ItemLocator}    ${list2Locator}    ${list2Value}
+    Log    ****selectFromListBySearchedValue结束
+
+从二级下拉列表选择值
+    [Arguments]    ${dropDownLocator}    ${list1ItemLocator}    ${list2Locator}    ${list2Value}
+    [Documentation]    被selectFromListByValue调用
+    点击元素_EK    ${dropDownLocator}
+    鼠标移到元素上_EK    ${list1ItemLocator}
+    点击元素_通过定位和文本_EK    ${list2Locator}    ${list2Value}
+
+从下拉菜单选择
+    [Arguments]    ${list_locator}    ${value}
+    等到页面包含元素为止_EK    ${list_locator}
+    点击元素_通过定位和文本_EK    ${list_locator}    ${value}
+
+输入密码_EK
+    [Arguments]    ${locator}    ${value}    ${timeout}=${WAITTIMEOUT}
+    Wait Until Element Is Enabled    ${locator}
+    Wait Until Keyword Succeeds    ${timeout}    1    Input Password    ${locator}    ${value}
+
+输入文本_EK
+    [Arguments]    ${locator}    ${text}    ${timeout}=${WAITTIMEOUT}
+    [Documentation]    只有输入${locator}不为None或空时，才执行该操作
+    ${isNotNone}    Is Not None And Not Empty    ${locator}
+    Run Keyword If    ${isNotNone}    等到页面包含元素为止_EK    ${locator}
+    Run Keyword If    ${isNotNone}    Wait Until Keyword Succeeds    ${timeout}    1    Input Text    ${locator}
+    ...    ${text}
+
+按下键盘_EK
+    [Arguments]    ${locator}    ${text}    ${timeout}=${WAITTIMEOUT}
+    [Documentation]    只有输入${locator}不为None或空时，才执行该操作
+    ${isNotNone}    Is Not None And Not Empty    ${locator}
+    Run Keyword If    ${isNotNone}    等到页面包含元素为止_EK    ${locator}
+    Run Keyword If    ${isNotNone}    Wait Until Keyword Succeeds    ${timeout}    1    Press Key    ${locator}
+    ...    ${text}
+
+清除元素文本_EK
+    [Arguments]    ${locator}    ${timeout}=${WAITTIMEOUT}
+    [Documentation]    只有输入${locator}不为None或空时，才执行该操作
+    ${isNotNone}    Is Not None And Not Empty    ${locator}
+    Run Keyword If    ${isNotNone}    等到页面包含元素为止_EK    ${locator}    ${timeout}
+    Run Keyword If    ${isNotNone}    Wait Until Keyword Succeeds    ${timeout}    1    Clear Element Text    ${locator}
+
+Is Not None And Not Empty
+    [Arguments]    ${locator}
+    ${ret}=    Run Keyword And Return Status    Should Not Be Empty    ${locator}
+    [Return]    ${ret}

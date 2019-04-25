@@ -1,0 +1,31 @@
+*** Settings ***
+Test Setup        清理谷歌浏览器进程
+Resource          ../3-Keywords/HomePage.txt
+Resource          ../3-Keywords/Common.txt
+Resource          ../3-Keywords/MemLeak.txt
+
+*** Test Cases ***
+demo
+    ${url}    Set Variable    http://baidu.com
+    ${LOOP_TIMES}    Set Variable    20    # 循环次数
+    ${driver}    登录后跳转到    ${url}
+    开始记录    ${driver}    # 获取chromedirver的pid，初始化excel
+    : FOR    ${i}    IN RANGE    ${LOOP_TIMES}
+    \    do something
+    \    记录当前内存使用情况    # 写入excel
+    ${time_in_millis}    Get Current Time Millis
+    MemUsageExcel.Save Report    ${OUTPUT_DIR}${/}sheet-${time_in_millis}.xlsx    # 保存结果excel
+
+*** Keywords ***
+登录后跳转到
+    [Arguments]    ${url}
+    ${driver}    打开Chrome    ${url}
+    ${cur_url}    Get Location
+    ${status}    是否包含    ${cur_url}    login-beta.example.com
+    Run Keyword If    ${status}    登录    ${url}    test1    passwd
+    ${status}    是否含有元素    uid
+    Run Keyword If    ${status}    登录    ${url}    test1    passwd
+    [Return]    ${driver}
+
+do something
+    Sleep    1
